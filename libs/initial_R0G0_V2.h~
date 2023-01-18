@@ -1,0 +1,151 @@
+// It is not recommended to put function definitions  
+// in a header file. Ideally there should be only 
+// function declarations. Purpose of this code is 
+// to only demonstrate working of header files. 
+
+// Initial values with double elipses centered in the origin
+#ifndef _INITIAL_R0G0H_
+#define _INITIAL_R0G0H_
+
+void initial_radius_promvel(double s[],int dim,int tap,double vec_r[],double vec_c[])
+{
+	double s0,s1,s2,s3,s4,s5,s6,s7,s8,s9,s10;
+	double r0,r1,r2,r3,r4,r5,r6,r7,r8,r9,r10;
+	double c0,c1,c2,c3,c4,c5,c6,c7,c8,c9,c10;
+	s0 = -1.0;					r0 = 15.2/1000.0;		c0 = 4.77;
+	s1 = 7.0357/100.0;			r1 = 13.9/1000.0;		c1 = 4.91;
+	s2 = s1 + 0.8/100.0;		r2 = 13.7/1000.0;		c2 = 4.93;
+	s3 = s2 + 0.9/100.0;		r3 = 13.5/1000.0;		c3 = 4.94;
+	s4 = s3 + 6.4737/100.0;		r4 = 12.3/1000.0;		c4 = 5.09;
+	s5 = s4 + 15.2/100.0;		r5 = 9.9/1000.0;		c5 = 5.43;
+	s6 = s5 + 1.8/100.0;		r6 = 9.7/1000.0;		c6 = 5.46;
+	s7 = s6 + 0.7/100.0;		r7 = 9.62/1000.0;		c7 = 5.48;
+	s8 = s7 + 0.7/100.0;		r8 = 9.55/1000.0;		c8 = 5.49;
+	s9 = s8 + 4.3/100.0;		r9 = 9.07/1000.0;		c9 = 5.57;
+	s10 = s9 + 4.3/100.0;		r10 = 8.6/1000.0;		c10 = 5.66;
+
+
+	double s_j;
+	double s_left,r_left,c_left;
+	double s_right,r_right,c_right;
+	int j;
+
+	for(j=0;j<dim;j++){
+		s_j = s[j];
+		if(tap == 1){
+			printf("s_j = %.15e, ",s_j);
+			// Feng (2014) parametrization
+			if(s_j < 0.0){
+				s_left = -1.0;			s_right = 0.0;
+				r_left = r0;			r_right = r0;
+				c_left = c0;			c_right = c0;
+			}if(0.0 <= s_j && s_j <= s1){
+				s_left = 0.0;			s_right = s1;
+				r_left = r0;			r_right = r1;
+				c_left = c0;			c_right = c1;
+			}if(s1 <= s_j && s_j <= s2){
+				s_left = s1;			s_right = s2;
+				r_left = r1;			r_right = r2;
+				c_left = c1;			c_right = c2;
+			}if(s2 <= s_j && s_j <= s3){
+				s_left = s2;			s_right = s3;
+				r_left = r2;			r_right = r3;
+				c_left = c2;			c_right = c3;
+			}if(s3 <= s_j && s_j <= s4){
+				s_left = s3;			s_right = s4;
+				r_left = r3;			r_right = r4;
+				c_left = c3;			c_right = c4;
+			}if(s4 <= s_j && s_j <= s5){
+				s_left = s4;			s_right = s5;
+				r_left = r4;			r_right = r5;
+				c_left = c4;			c_right = c5;
+			}if(s5 <= s_j && s_j <= s6){
+				s_left = s5;			s_right = s6;
+				r_left = r5;			r_right = r6;
+				c_left = c5;			c_right = c6;
+			}if(s6 <= s_j && s_j <= s7){
+				s_left = s6;			s_right = s7;
+				r_left = r6;			r_right = r7;
+				c_left = c6;			c_right = c7;
+			}if(s7 <= s_j && s_j <= s8){
+				s_left = s7;			s_right = s8;
+				r_left = r7;			r_right = r8;
+				c_left = c7;			c_right = c8;
+			}if(s8 <= s_j && s_j <= s9){
+				s_left = s8;			s_right = s9;
+				r_left = r8;			r_right = r9;
+				c_left = c8;			c_right = c9;
+			}if(s9 <= s_j && s_j <= s10){
+				s_left = s9;			s_right = s10;
+				r_left = r9;			r_right = r10;
+				c_left = c9;			c_right = c10;
+			}if(s_j > s10){
+				s_left = s10;			s_right = s10 + 3.0*s10/dim;
+				r_left = r10;			r_right = r10;
+				c_left = c10;			c_right = c10;	
+			}
+			printf("s_left = %.15e, s_rigth = %.15e\n",s_left,s_right);
+			vec_r[j] = r_left + (r_right - r_left)*(s_j - s_left)/(s_right - s_left);
+			vec_c[j] = c_left + (c_right - c_left)*(s_j - s_left)/(s_right - s_left);
+		}else{
+			// Constant parametrization
+			vec_r[j] = r0;
+			vec_c[j] = c0;
+		}
+	}
+}
+
+void R0G0_elipse(double *R0,double *G0,double vec_r[],double vec_c[],double th[],int dims,int dimth,double ex)
+{
+	int j,k,ic;
+	double th_k,cd;
+	double elipse;
+
+	double ho = 1.25/1000.0;
+	double E = 400.0;
+	for(ic=0;ic<dims*dimth;ic++){
+		j = ic%dims;
+		k = ic/dims;
+
+		R0[ic] = 0.0;
+		G0[ic] = 0.0;
+		th_k = th[k];
+		elipse = sqrt(1.0 + pow(ex*cos(th_k),2.0)/(1.0 - pow(ex,2.0)));
+		//elipse = sqrt(1.0 - pow(ex*cos(th_k),2.0));
+		//elipse = 1.0;
+		cd = vec_c[j];
+		R0[ic] = elipse*vec_r[j];//10.0/1000.0;//;
+		G0[ic] = (4.0/3.0)*(ho/R0[ic])*E;
+	}
+}
+
+void R0G0_double_elipse(double *R0,double *G0,double vec_r[],double vec_c[],double th[],int dims,int dimth,double ex1,double ex2)
+{
+	int j,k,ic;
+	double th_k,cd;
+	double elipse1,elipse2;
+
+	for(ic=0;ic<dims*dimth;ic++){
+		j = ic%dims;
+		k = ic/dims;
+
+		R0[ic] = 0.0;
+		G0[ic] = 0.0;
+		th_k = th[k];
+		elipse1 = sqrt(1.0 + pow(ex1*cos(th_k),2.0)/(1.0 - pow(ex1,2.0)));
+		elipse2 = sqrt(1.0 + pow(ex2*cos(th_k),2.0)/(1.0 - pow(ex2,2.0)));
+
+		cd = vec_c[j];
+		if(cos(th_k) > 0.0){
+			R0[ic] = elipse1*vec_r[j];
+			//cd = cd*elipse1;
+		}else{
+			R0[ic] = elipse2*vec_r[j];
+			//cd = cd*elipse2;
+		}
+
+		G0[ic] = 2.0*pow(cd,2.0);
+	}
+}
+
+#endif
